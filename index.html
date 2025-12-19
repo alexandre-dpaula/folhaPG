@@ -548,6 +548,91 @@
             font-weight: 500;
         }
 
+        /* Menu Configurações */
+        .menu-dropdown {
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 8px;
+            min-width: 200px;
+            box-shadow: var(--shadow-lg);
+            z-index: 200;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .menu-dropdown.show {
+            opacity: 1;
+            pointer-events: all;
+            transform: translateY(0);
+        }
+
+        .menu-item {
+            padding: 12px 16px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .menu-item:hover {
+            background: var(--card-hover);
+        }
+
+        .menu-item .lucide {
+            width: 18px;
+            height: 18px;
+            color: var(--text-secondary);
+        }
+
+        /* Modal de Edição */
+        .edit-form {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+            font-size: 16px;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+
         /* Payment Cards */
         .payment-cards {
             display: grid;
@@ -1090,12 +1175,79 @@
         </div>
     </div>
 
+    <!-- Menu Dropdown -->
+    <div class="menu-dropdown" id="menuDropdown">
+        <div class="menu-item" id="menuEditar">
+            <i data-lucide="settings"></i>
+            <span>Editar Valores</span>
+        </div>
+    </div>
+
+    <!-- Modal de Autenticação para Menu -->
+    <div class="modal" id="modalAutenticacao">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Autenticação</div>
+                <div class="modal-subtitle">Digite a senha para acessar as configurações</div>
+            </div>
+            <input
+                type="password"
+                class="modal-input"
+                id="senhaMenuInput"
+                placeholder="******"
+                maxlength="6"
+                inputmode="numeric"
+            >
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-cancel" id="btnCancelarMenu">Cancelar</button>
+                <button class="modal-btn modal-btn-confirm" id="btnConfirmarMenu">Confirmar</button>
+            </div>
+            <div class="modal-error" id="modalMenuError"></div>
+        </div>
+    </div>
+
+    <!-- Modal de Edição de Valores -->
+    <div class="modal" id="modalEdicao">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Editar Valores</div>
+                <div class="modal-subtitle">Ajuste os valores do sistema</div>
+            </div>
+            <div class="edit-form">
+                <div class="form-group">
+                    <label class="form-label" for="editValorTotal">Valor Total</label>
+                    <input
+                        type="number"
+                        class="form-input"
+                        id="editValorTotal"
+                        placeholder="124800"
+                        step="0.01"
+                    >
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="editValorPago">Valor Pago</label>
+                    <input
+                        type="number"
+                        class="form-input"
+                        id="editValorPago"
+                        placeholder="70400"
+                        step="0.01"
+                    >
+                </div>
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-cancel" id="btnCancelarEdicao">Cancelar</button>
+                <button class="modal-btn modal-btn-confirm" id="btnSalvarEdicao">Salvar</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast Notification -->
     <div class="toast" id="toast"></div>
 
     <script>
         // Constantes
-        const VALOR_TOTAL = 124800;
+        let VALOR_TOTAL = 124800;
         const CHAVE_PIX = '61.215.519/0001-81';
         const STORAGE_KEY = 'sistemaXandinho';
         const SENHA_CONFIRMACAO = '891372';
@@ -1103,6 +1255,7 @@
         // Dados históricos iniciais
         const DADOS_INICIAIS = {
             valorPagoAtual: 70400,
+            valorTotal: 124800,
             pagamentos: [],
             pagamentosMensais: {
                 'Junho - Novembro 2025': 10400,
@@ -1131,7 +1284,19 @@
             senhaInput: document.getElementById('senhaInput'),
             btnCancelar: document.getElementById('btnCancelar'),
             btnConfirmarSenha: document.getElementById('btnConfirmarSenha'),
-            modalError: document.getElementById('modalError')
+            modalError: document.getElementById('modalError'),
+            menuDropdown: document.getElementById('menuDropdown'),
+            menuBtn: document.querySelector('.menu-btn'),
+            modalAutenticacao: document.getElementById('modalAutenticacao'),
+            senhaMenuInput: document.getElementById('senhaMenuInput'),
+            btnCancelarMenu: document.getElementById('btnCancelarMenu'),
+            btnConfirmarMenu: document.getElementById('btnConfirmarMenu'),
+            modalMenuError: document.getElementById('modalMenuError'),
+            modalEdicao: document.getElementById('modalEdicao'),
+            editValorTotal: document.getElementById('editValorTotal'),
+            editValorPago: document.getElementById('editValorPago'),
+            btnCancelarEdicao: document.getElementById('btnCancelarEdicao'),
+            btnSalvarEdicao: document.getElementById('btnSalvarEdicao')
         };
 
         // Funções de utilidade
@@ -1197,6 +1362,10 @@
                 const savedData = localStorage.getItem(STORAGE_KEY);
                 if (savedData) {
                     state = JSON.parse(savedData);
+                    // Atualizar VALOR_TOTAL se existir no estado
+                    if (state.valorTotal) {
+                        VALOR_TOTAL = state.valorTotal;
+                    }
                 } else {
                     state = { ...DADOS_INICIAIS };
                     salvarEstado();
@@ -1209,6 +1378,8 @@
 
         function salvarEstado() {
             try {
+                // Garantir que valorTotal está no estado
+                state.valorTotal = VALOR_TOTAL;
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
             } catch (error) {
                 console.error('Erro ao salvar dados:', error);
@@ -1421,6 +1592,77 @@
             }
         }
 
+        // Menu e Modais de Configuração
+        function toggleMenu() {
+            elements.menuDropdown.classList.toggle('show');
+        }
+
+        function fecharMenu() {
+            elements.menuDropdown.classList.remove('show');
+        }
+
+        function abrirModalAutenticacao() {
+            fecharMenu();
+            elements.modalAutenticacao.classList.add('show');
+            elements.senhaMenuInput.value = '';
+            elements.modalMenuError.textContent = '';
+            elements.senhaMenuInput.focus();
+        }
+
+        function fecharModalAutenticacao() {
+            elements.modalAutenticacao.classList.remove('show');
+        }
+
+        function validarSenhaMenu() {
+            const senhaDigitada = elements.senhaMenuInput.value;
+
+            if (senhaDigitada === SENHA_CONFIRMACAO) {
+                fecharModalAutenticacao();
+                abrirModalEdicao();
+            } else {
+                elements.modalMenuError.textContent = 'Senha incorreta. Tente novamente.';
+                elements.senhaMenuInput.value = '';
+                elements.senhaMenuInput.focus();
+            }
+        }
+
+        function abrirModalEdicao() {
+            elements.modalEdicao.classList.add('show');
+            elements.editValorTotal.value = VALOR_TOTAL;
+            elements.editValorPago.value = state.valorPagoAtual;
+        }
+
+        function fecharModalEdicao() {
+            elements.modalEdicao.classList.remove('show');
+        }
+
+        function salvarEdicao() {
+            const novoValorTotal = parseFloat(elements.editValorTotal.value);
+            const novoValorPago = parseFloat(elements.editValorPago.value);
+
+            if (isNaN(novoValorTotal) || isNaN(novoValorPago)) {
+                mostrarToast('Por favor, insira valores válidos');
+                return;
+            }
+
+            if (novoValorPago > novoValorTotal) {
+                mostrarToast('Valor pago não pode ser maior que o valor total');
+                return;
+            }
+
+            // Atualizar valores
+            VALOR_TOTAL = novoValorTotal;
+            state.valorTotal = novoValorTotal;
+            state.valorPagoAtual = novoValorPago;
+
+            // Salvar e atualizar
+            salvarEstado();
+            atualizarInterface();
+            fecharModalEdicao();
+
+            mostrarToast('Valores atualizados com sucesso!');
+        }
+
         // Tabs
         function trocarAba(aba) {
             const tabDivida = document.getElementById('tabDivida');
@@ -1478,6 +1720,43 @@
         elements.modal.addEventListener('click', (e) => {
             if (e.target === elements.modal) {
                 fecharModal();
+            }
+        });
+
+        // Menu e Modais de Configuração - Event Listeners
+        elements.menuBtn.addEventListener('click', toggleMenu);
+
+        document.getElementById('menuEditar').addEventListener('click', abrirModalAutenticacao);
+
+        elements.btnCancelarMenu.addEventListener('click', fecharModalAutenticacao);
+        elements.btnConfirmarMenu.addEventListener('click', validarSenhaMenu);
+
+        elements.senhaMenuInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                validarSenhaMenu();
+            }
+        });
+
+        elements.btnCancelarEdicao.addEventListener('click', fecharModalEdicao);
+        elements.btnSalvarEdicao.addEventListener('click', salvarEdicao);
+
+        // Fechar modais ao clicar fora
+        elements.modalAutenticacao.addEventListener('click', (e) => {
+            if (e.target === elements.modalAutenticacao) {
+                fecharModalAutenticacao();
+            }
+        });
+
+        elements.modalEdicao.addEventListener('click', (e) => {
+            if (e.target === elements.modalEdicao) {
+                fecharModalEdicao();
+            }
+        });
+
+        // Fechar menu ao clicar fora
+        document.addEventListener('click', (e) => {
+            if (!elements.menuDropdown.contains(e.target) && !elements.menuBtn.contains(e.target)) {
+                fecharMenu();
             }
         });
 
