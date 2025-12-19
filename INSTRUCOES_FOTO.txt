@@ -1,0 +1,38 @@
+INSTRUÇÕES PARA ADICIONAR A FOTO DE PERFIL
+===========================================
+
+A foto de perfil do Alexandre Dpaula (homem com microfone) precisa ser adicionada manualmente.
+
+OPÇÃO 1 - Salvar a foto localmente:
+------------------------------------
+1. Salve a foto da screenshot como "alexandre-profile.jpg"
+2. Coloque o arquivo na mesma pasta do index.html
+3. Pronto! O HTML já está configurado para usar esse arquivo
+
+OPÇÃO 2 - Usar uma URL online:
+-------------------------------
+1. Faça upload da foto em um serviço como:
+   - Imgur (https://imgur.com)
+   - ImgBB (https://imgbb.com)
+   - GitHub (adicione ao repositório)
+
+2. Copie a URL da imagem
+
+3. Edite o arquivo index.html na linha 1049:
+   Substitua:
+   src="alexandre-profile.jpg"
+   
+   Por:
+   src="SUA_URL_AQUI"
+
+OPÇÃO 3 - Adicionar ao repositório GitHub:
+-------------------------------------------
+1. Salve a foto como "alexandre-profile.jpg"
+2. Execute:
+   git add alexandre-profile.jpg
+   git commit -m "Adiciona foto de perfil"
+   git push
+
+A foto será automaticamente carregada quando você abrir o index.html!
+
+Se a foto não for encontrada, um avatar com as iniciais "AD" será exibido automaticamente.
